@@ -1,0 +1,72 @@
+{
+  "runs": [
+    {
+      "n": 125,
+      "brute_s": 0.026256124998326413,
+      "brute_calls": 7750,
+      "brute_peak_bytes": 6744,
+      "lsh_s": 0.7411460830044234,
+      "lsh_calls": 1,
+      "lsh_peak_bytes": 654583
+    },
+    {
+      "n": 250,
+      "brute_s": 0.09555058400292182,
+      "brute_calls": 31125,
+      "brute_peak_bytes": 7416,
+      "lsh_s": 1.4824721250042785,
+      "lsh_calls": 3,
+      "lsh_peak_bytes": 1268200
+    },
+    {
+      "n": 500,
+      "brute_s": 0.3934286660005455,
+      "brute_calls": 124750,
+      "brute_peak_bytes": 8120,
+      "lsh_s": 2.975750291996519,
+      "lsh_calls": 15,
+      "lsh_peak_bytes": 2548796
+    },
+    {
+      "n": 1000,
+      "brute_s": 1.5919488329964224,
+      "brute_calls": 499500,
+      "brute_peak_bytes": 10680,
+      "lsh_s": 5.942795834002027,
+      "lsh_calls": 53,
+      "lsh_peak_bytes": 5112052
+    },
+    {
+      "n": 2000,
+      "brute_s": 6.439869167006691,
+      "brute_calls": 1999000,
+      "brute_peak_bytes": 21400,
+      "lsh_s": 11.986488707996614,
+      "lsh_calls": 196,
+      "lsh_peak_bytes": 10246228
+    },
+    {
+      "n": 4000,
+      "brute_s": 7.333141374998377,
+      "brute_calls": 2246140,
+      "brute_peak_bytes": 29104,
+      "lsh_s": 12.538676500000292,
+      "lsh_calls": 222,
+      "lsh_peak_bytes": 10943267
+    },
+    {
+      "n": 8000,
+      "brute_s": 7.298226833001536,
+      "brute_calls": 2246140,
+      "brute_peak_bytes": 22328,
+      "lsh_s": 12.683435166996787,
+      "lsh_calls": 222,
+      "lsh_peak_bytes": 10784916
+    }
+  ],
+  "machine": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.13.7"
+  }
+}
