@@ -30,7 +30,11 @@ BOOK_HASHES = [lambda r: (r + 1) % 5, lambda r: (3 * r + 1) % 5]
 
 def jaccard(a, b):
     """|a and b| / |a or b|. Empty union is 0, not an error."""
-    raise NotImplementedError("jaccard similarity")
+    union = a | b
+
+    if not union:
+        return 0
+    return len(a & b) / len(union)
 
 
 def minhash_signatures(columns, hashes, n_rows):
@@ -48,7 +52,19 @@ def minhash_signatures(columns, hashes, n_rows):
     written something correct that does not survive a dataset that does not fit
     in memory, and not fitting in memory is what this course is about.
     """
-    raise NotImplementedError("signature matrix")
+    INF = float("inf")
+    sig = [[INF] * len(hashes) for _ in columns]
+
+    for r in range(n_rows):
+        hr = [h(r) for h in hashes]
+        for c, col in enumerate(columns):
+            if r in col:
+                s = sig[c]
+                for k, v in enumerate(hr):
+                    if v < s[k]:
+                        s[k] = v
+
+    return sig
 
 
 def lsh_candidates(signatures, bands):
@@ -60,7 +76,37 @@ def lsh_candidates(signatures, bands):
     The signature length must divide evenly by `bands`, or you have to decide
     what to do with the remainder. Say what you decided.
     """
-    raise NotImplementedError("LSH candidate pairs")
+    n_docs = len(signatures)
+    signature_length = len(signatures[0])
+    rows_per_band = signature_length // bands
+
+    band_ranges = []
+    for b in range(bands - 1):
+        start = b * rows_per_band
+        end = start + rows_per_band
+        band_ranges.append((start, end))
+    band_ranges.append(((bands - 1) * rows_per_band, signature_length))
+
+    candidates = set()
+
+    for start, end in band_ranges:
+        buckets = {}
+
+        for doc_index in range(n_docs):
+            piece = tuple(signatures[doc_index][start:end])
+
+            if piece not in buckets:
+                buckets[piece] = []
+            buckets[piece].append(doc_index)
+
+        for doc_list in buckets.values():
+            for i in range(len(doc_list)):
+                for j in range(i + 1, len(doc_list)):
+                    doc_a = doc_list[i]
+                    doc_b = doc_list[j]
+                    candidates.add((doc_a, doc_b))
+
+    return candidates
 
 
 # ------------------------------------------------------------------- harness

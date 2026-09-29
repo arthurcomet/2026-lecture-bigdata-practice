@@ -60,8 +60,38 @@ class YourFinder:
     You may reuse your Task 1 code.
     """
 
-    def __init__(self, threshold):
-        raise NotImplementedError("write your finder")
+    def __init__(self, threshold, n_hashes=120, bands=40, seed=0):
+        import random
+        self.threshold = threshold
+        self.n_hashes = n_hashes
+        self.bands = bands
+        rng = random.Random(seed)
+        self.p = 2_147_483_647
+        self.coefs = []
+        for _ in range(n_hashes):
+            a = rng.randrange(1, self.p)
+            b = rng.randrange(0, self.p)
+            self.coefs.append((a, b))
+
+    def signature(self, doc):
+        sig = []
+        for a, b in self.coefs:
+            smallest = None
+            for number in doc:
+                mixed = (a * number + b) % self.p
+                if smallest is None or mixed < smallest:
+                    smallest = mixed
+            sig.append(smallest)
+        return sig
 
     def find(self, docs, similarity):
-        raise NotImplementedError
+        from task1_minhash import lsh_candidates
+        signatures = []
+        for doc in docs:
+            signatures.append(self.signature(doc))
+        suspects = lsh_candidates(signatures, self.bands)
+        found = set()
+        for i, j in suspects:
+            if similarity(docs[i], docs[j]) >= self.threshold:
+                found.add((i, j))
+        return found
