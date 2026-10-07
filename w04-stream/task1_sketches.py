@@ -13,7 +13,7 @@ approximating.
 
     python3 task1_sketches.py --verify
 """
-import argparse, random
+import argparse, hashlib, math, random, struct
 
 
 class BloomFilter:
@@ -28,13 +28,28 @@ class BloomFilter:
     """
 
     def __init__(self, m, k, seed=246):
-        raise NotImplementedError("write the Bloom filter")
+        self.m = m
+        self.k = k
+        self.seed = seed
+        self.bits = bytearray((m + 7) // 8)   # m bits, packed 8 per byte
+
+    def _positions(self, item):
+        """The k bit positions of an item (two hashes combined: h1 + i*h2)."""
+        digest = hashlib.blake2b(str(item).encode(), digest_size=16,
+                                 key=str(self.seed).encode()).digest()
+        h1, h2 = struct.unpack("<QQ", digest)
+        h2 = h2 | 1
+        return [(h1 + i * h2) % self.m for i in range(self.k)]
 
     def add(self, item):
-        raise NotImplementedError
+        for pos in self._positions(item):
+            self.bits[pos // 8] |= 1 << (pos % 8)       # set the bit, never clear it
 
     def __contains__(self, item):
-        raise NotImplementedError
+        for pos in self._positions(item):
+            if not (self.bits[pos // 8] >> (pos % 8)) & 1:
+                return False                             # one bit missing: surely absent
+        return True                                      # all bits set: probably present
 
     def expected_fp_rate(self, n_inserted):
         """The textbook's predicted false-positive rate after n insertions.
@@ -42,7 +57,7 @@ class BloomFilter:
         §4.4.2 derives it. Return the number, do not measure it - the harness
         measures separately and compares the two.
         """
-        raise NotImplementedError
+        return (1 - math.exp(-self.k * n_inserted / self.m)) ** self.k
 
 
 def flajolet_martin(stream, n_hashes=64, seed=246):
@@ -67,7 +82,37 @@ def flajolet_martin(stream, n_hashes=64, seed=246):
 
     Return your estimate as a float.
     """
-    raise NotImplementedError("write Flajolet-Martin")
+    # best[i] = the most trailing zeros hash number i has produced so far
+    best = [0] * n_hashes
+    for item in stream:
+        for i, h in enumerate(_hashes(item, n_hashes, seed)):
+            if h != 0:
+                zeros = (h & -h).bit_length() - 1
+                if zeros > best[i]:
+                    best[i] = zeros
+
+    # Average the exponents R, not the values 2^R: one lucky hash would blow up
+    # the average of 2^R. Then divide by ~1.26, the bias of this shortcut.
+    mean_r = sum(best) / n_hashes
+    return 2 ** mean_r / FM_BIAS
+
+
+FM_BIAS = 2 ** 0.3327   # E[max trailing zeros] is about log2(n) + 0.33
+
+
+def _hashes(item, n_hashes, seed):
+    """n_hashes different 64-bit hash values of one item.
+
+    One blake2b call gives 64 bytes = eight 64-bit values, so we call it once
+    per group of 8 hash functions, with a different salt each time."""
+    data = str(item).encode()
+    values = []
+    for group in range((n_hashes + 7) // 8):
+        digest = hashlib.blake2b(data, digest_size=64,
+                                 salt=group.to_bytes(8, "little"),
+                                 person=str(seed).encode()[:16]).digest()
+        values += struct.unpack("<8Q", digest)
+    return values[:n_hashes]
 
 
 def reservoir_sample(stream, k, seed=246):
@@ -78,7 +123,16 @@ def reservoir_sample(stream, k, seed=246):
 
     Return a list of k items (or fewer if the stream was shorter).
     """
-    raise NotImplementedError("write reservoir sampling")
+    rng = random.Random(seed)
+    reservoir = []
+    for n, item in enumerate(stream, start=1):
+        if n <= k:
+            reservoir.append(item)
+        else:
+            j = rng.randrange(n)
+            if j < k:
+                reservoir[j] = item
+    return reservoir
 
 
 # ------------------------------------------------------------------- harness
