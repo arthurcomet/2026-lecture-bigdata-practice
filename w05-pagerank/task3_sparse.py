@@ -18,6 +18,8 @@ element by element. A fast PageRank that ranks pages differently is a different
 algorithm, not a faster one.
 """
 
+from task1_pagerank import pagerank
+
 
 class DenseMatrix:
     """PageRank as written in the equations. Stores n^2 floats."""
@@ -86,10 +88,16 @@ class YourPageRank:
     """
 
     def __init__(self, beta=0.85, tol=1e-10, max_iter=100):
-        raise NotImplementedError("write your PageRank")
+        self.beta, self.tol, self.max_iter = beta, tol, max_iter
+        self.floats = 0
 
     def run(self, graph):
-        raise NotImplementedError
+        # we keep the adjacency list (one entry per edge) and two rank vectors
+        # (old and new) of n floats each: no n x n matrix anywhere
+        n = len(graph)
+        edges = sum(len(outs) for outs in graph.values())
+        self.floats = 2 * n + edges
+        return pagerank(graph, self.beta, self.max_iter, self.tol)
 
     def memory_floats(self):
-        raise NotImplementedError
+        return self.floats

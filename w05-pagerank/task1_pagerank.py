@@ -41,7 +41,28 @@ def pagerank(graph, beta=0.85, iterations=100, tol=1e-10):
     you should call it converged. Return the ranks, and set `pagerank.iterations`
     to how many you actually used, because Task 2 measures that.
     """
-    raise NotImplementedError("implement PageRank")
+    n = len(graph)
+    rank = {v: 1 / n for v in graph}
+
+    for step in range(1, iterations + 1):
+        # dead ends: their rank is shared equally by all n nodes
+        dead_rank = sum(rank[v] for v in graph if not graph[v])
+        # every node gets the same base: teleport share + dead-end share
+        base = ((1 - beta) + beta * dead_rank) / n
+        new_rank = {v: base for v in graph}
+
+        # normal nodes: split beta * rank equally between their out-links
+        for v, outs in graph.items():
+            for w in outs:
+                new_rank[w] += beta * rank[v] / len(outs)
+
+        change = sum(abs(new_rank[v] - rank[v]) for v in graph)
+        rank = new_rank
+        if change < tol:
+            break
+
+    pagerank.iterations = step
+    return rank
 
 
 def pagerank_no_teleport(graph, iterations=100):
@@ -50,7 +71,16 @@ def pagerank_no_teleport(graph, iterations=100):
     It exists so you can watch both failures happen rather than take them on
     trust. The harness checks that it really does fail.
     """
-    raise NotImplementedError("implement the broken version")
+    n = len(graph)
+    rank = {v: 1 / n for v in graph}
+
+    for _ in range(iterations):
+        new_rank = {v: 0.0 for v in graph}
+        for v, outs in graph.items():
+            for w in outs:                       # a dead end has no outs: its rank is lost
+                new_rank[w] += rank[v] / len(outs)
+        rank = new_rank
+    return rank
 
 
 # ------------------------------------------------------------------- harness

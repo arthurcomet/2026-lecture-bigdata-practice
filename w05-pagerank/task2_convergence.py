@@ -32,6 +32,8 @@ def main():
     p.add_argument("--nodes", type=int, default=None,
                    help="graph size; default is the harness graph")
     p.add_argument("--tol", type=float, default=1e-10)
+    p.add_argument("--max-iter", type=int, default=5000,
+                   help="safety cap; must be above the iterations needed")
     a = p.parse_args()
     os.makedirs(OUT, exist_ok=True)
 
@@ -45,7 +47,7 @@ def main():
     rows = []
     for beta in [float(x) for x in a.betas.split(",")]:
         t0 = time.perf_counter()
-        ranks = pagerank(graph, beta=beta, iterations=500, tol=a.tol)
+        ranks = pagerank(graph, beta=beta, iterations=a.max_iter, tol=a.tol)
         elapsed = time.perf_counter() - t0
         iters = getattr(pagerank, "iterations", None)
         top = sorted(ranks.items(), key=lambda kv: -kv[1])[:10]
