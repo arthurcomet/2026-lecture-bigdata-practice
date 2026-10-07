@@ -14,6 +14,7 @@ smaller second pass, and the whole chapter is consequences of that trade.
     python3 task1_apriori.py --verify
 """
 import argparse
+from collections import Counter
 from itertools import combinations
 
 # Small enough to check by hand. support threshold 3 unless stated.
@@ -30,7 +31,10 @@ BASKETS = [
 
 def frequent_singletons(baskets, support):
     """Items appearing in at least `support` baskets. Return {item: count}."""
-    raise NotImplementedError("pass one")
+    counts = Counter()
+    for basket in baskets:
+        counts.update(basket)
+    return {item: n for item, n in counts.items() if n >= support}
 
 
 def frequent_pairs(baskets, support):
@@ -44,7 +48,15 @@ def frequent_pairs(baskets, support):
     A-Priori exists to avoid, and it will pass this harness while failing the
     point. Task 3 measures whether you actually did it.
     """
-    raise NotImplementedError("pass two")
+    frequent_items = frequent_singletons(baskets, support)       # pass one
+
+    pair_counts = Counter()                                      # pass two
+    for basket in baskets:
+        survivors = sorted(i for i in basket if i in frequent_items)   # drop rare items
+        for pair in combinations(survivors, 2):
+            pair_counts[pair] += 1
+
+    return {frozenset(pair): n for pair, n in pair_counts.items() if n >= support}
 
 
 def association_rules(baskets, support, min_confidence):
@@ -60,7 +72,21 @@ def association_rules(baskets, support, min_confidence):
     rule with high confidence and lift near 1 tells you nothing - the consequent
     was common anyway - and §6.1.3 is about why that matters more than it looks.
     """
-    raise NotImplementedError("rules")
+    n_baskets = len(baskets)
+    item_counts = frequent_singletons(baskets, support)
+    pair_counts = frequent_pairs(baskets, support)
+
+    rules = []
+    for pair, pair_count in pair_counts.items():
+        i, j = sorted(pair)
+        for antecedent, consequent in [(i, j), (j, i)]:          # both directions
+            confidence = pair_count / item_counts[antecedent]
+            lift = confidence / (item_counts[consequent] / n_baskets)
+            if confidence >= min_confidence:
+                rules.append((antecedent, consequent, confidence, lift))
+
+    rules.sort(key=lambda rule: rule[2], reverse=True)
+    return rules
 
 
 # ------------------------------------------------------------------- harness

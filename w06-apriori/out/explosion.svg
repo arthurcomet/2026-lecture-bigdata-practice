@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="sans-serif" font-size="12">
+<rect width="640" height="400" fill="white"/>
+<text x="320.0" y="22" text-anchor="middle" font-size="14" font-weight="bold">Counters needed vs frequent pairs found (log-log)</text>
+<line x1="80" y1="340.0" x2="610" y2="340.0" stroke="#ddd"/>
+<text x="72" y="344.0" text-anchor="end">100</text>
+<line x1="80" y1="265.0" x2="610" y2="265.0" stroke="#ddd"/>
+<text x="72" y="269.0" text-anchor="end">1,000</text>
+<line x1="80" y1="190.0" x2="610" y2="190.0" stroke="#ddd"/>
+<text x="72" y="194.0" text-anchor="end">10,000</text>
+<line x1="80" y1="115.0" x2="610" y2="115.0" stroke="#ddd"/>
+<text x="72" y="119.0" text-anchor="end">100,000</text>
+<line x1="80" y1="40.0" x2="610" y2="40.0" stroke="#ddd"/>
+<text x="72" y="44.0" text-anchor="end">1,000,000</text>
+<line x1="80.0" y1="40" x2="80.0" y2="340" stroke="#eee"/>
+<text x="80.0" y="358" text-anchor="middle">400</text>
+<line x1="202.63045297467238" y1="40" x2="202.63045297467238" y2="340" stroke="#eee"/>
+<text x="202.63045297467238" y="358" text-anchor="middle">100</text>
+<line x1="325.26090594934476" y1="40" x2="325.26090594934476" y2="340" stroke="#eee"/>
+<text x="325.26090594934476" y="358" text-anchor="middle">25</text>
+<line x1="451.5024388070114" y1="40" x2="451.5024388070114" y2="340" stroke="#eee"/>
+<text x="451.5024388070114" y="358" text-anchor="middle">6</text>
+<line x1="610.0" y1="40" x2="610.0" y2="340" stroke="#eee"/>
+<text x="610.0" y="358" text-anchor="middle">1</text>
+<text x="320.0" y="388" text-anchor="middle">support threshold (lower = more answers wanted)</text>
+<polyline points="610.0,43.7 512.8,43.7 451.5,43.7 390.2,43.7 325.3,43.7 263.9,46.5 202.6,82.2 141.3,132.4 80.0,188.1" fill="none" stroke="#2a6fb0" stroke-width="2.5"/>
+<circle cx="610.0" cy="43.7" r="3.5" fill="#2a6fb0"/>
+<circle cx="512.8" cy="43.7" r="3.5" fill="#2a6fb0"/>
+<circle cx="451.5" cy="43.7" r="3.5" fill="#2a6fb0"/>
+<circle cx="390.2" cy="43.7" r="3.5" fill="#2a6fb0"/>
+<circle cx="325.3" cy="43.7" r="3.5" fill="#2a6fb0"/>
+<circle cx="263.9" cy="46.5" r="3.5" fill="#2a6fb0"/>
+<circle cx="202.6" cy="82.2" r="3.5" fill="#2a6fb0"/>
+<circle cx="141.3" cy="132.4" r="3.5" fill="#2a6fb0"/>
+<circle cx="80.0" cy="188.1" r="3.5" fill="#2a6fb0"/>
+<text x="283.68477351266387" y="59.472798287931695" fill="#2a6fb0" font-weight="bold">peak pair counters (what you must hold)</text>
+<polyline points="610.0,43.7 512.8,85.1 451.5,114.4 390.2,142.4 325.3,172.6 263.9,204.6 202.6,238.7 141.3,273.3 80.0,310.3" fill="none" stroke="#d1661f" stroke-width="2.5"/>
+<circle cx="610.0" cy="43.7" r="3.5" fill="#d1661f"/>
+<circle cx="512.8" cy="85.1" r="3.5" fill="#d1661f"/>
+<circle cx="451.5" cy="114.4" r="3.5" fill="#d1661f"/>
+<circle cx="390.2" cy="142.4" r="3.5" fill="#d1661f"/>
+<circle cx="325.3" cy="172.6" r="3.5" fill="#d1661f"/>
+<circle cx="263.9" cy="204.6" r="3.5" fill="#d1661f"/>
+<circle cx="202.6" cy="238.7" r="3.5" fill="#d1661f"/>
+<circle cx="141.3" cy="273.3" r="3.5" fill="#d1661f"/>
+<circle cx="80.0" cy="310.3" r="3.5" fill="#d1661f"/>
+<text x="172.63045297467238" y="279.7931555708239" fill="#d1661f" font-weight="bold">frequent pairs (the answers)</text>
+</svg>
