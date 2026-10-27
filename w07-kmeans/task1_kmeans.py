@@ -22,7 +22,9 @@ BLOBS = [(0.0, 0.0), (0.2, 0.1), (0.1, 0.2),
 
 def euclidean(a, b):
     """Distance between two points of any dimension."""
-    raise NotImplementedError("distance")
+    if len(a) != len(b):
+        raise ValueError("points have different dimensions")
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
 
 
 def assign(points, centroids):
@@ -30,16 +32,47 @@ def assign(points, centroids):
 
     Ties go to the lower index, so that everybody's answer is the same.
     """
-    raise NotImplementedError("assignment step")
+    labels = []
+    for p in points:
+        best, bi = None, 0
+        for j, c in enumerate(centroids):
+            d = euclidean(p, c)
+            if best is None or d < best:      # strict "<": a tie keeps the lower index
+                best, bi = d, j
+        labels.append(bi)
+    return labels
 
 
-def update(points, labels, k):
+def update(points, labels, k, previous=None):
     """Move each centroid to the mean of its points.
 
     An empty cluster has no mean. Decide what you do - and say so, because the
     choice changes the result and there is more than one defensible answer.
+
+    My choice (R3): an empty cluster keeps its previous centroid. It is the
+    conservative option - nothing moves without evidence - and it is the same
+    rule as the baseline in task 3, so results stay comparable. The alternative
+    (re-seed it at the point furthest from its centroid) would rescue a lost
+    cluster faster but makes the result depend on one outlier.
     """
-    raise NotImplementedError("update step")
+    sums = [None] * k
+    counts = [0] * k
+    for p, l in zip(points, labels):
+        if sums[l] is None:
+            sums[l] = list(p)
+        else:
+            for d, v in enumerate(p):
+                sums[l][d] += v
+        counts[l] += 1
+    out = []
+    for j in range(k):
+        if counts[j]:
+            out.append(tuple(v / counts[j] for v in sums[j]))
+        elif previous is not None:
+            out.append(tuple(previous[j]))          # empty cluster: keep old centroid
+        else:
+            raise ValueError(f"cluster {j} is empty and no previous centroid was given")
+    return out
 
 
 def kmeans(points, k, init="random", seed=246, max_iter=100):
@@ -56,12 +89,37 @@ def kmeans(points, k, init="random", seed=246, max_iter=100):
 
     Set `kmeans.iterations` to how many passes you used.
     """
-    raise NotImplementedError("k-means")
+    rng = random.Random(seed)
+    if init == "random":
+        centroids = [tuple(p) for p in rng.sample(points, k)]
+    elif init == "++":
+        centroids = [tuple(rng.choice(points))]
+        while len(centroids) < k:
+            # weight = squared distance to the nearest centroid already chosen
+            weights = [min(euclidean(p, c) for c in centroids) ** 2 for p in points]
+            if sum(weights) == 0:                    # every point is already a centroid
+                centroids.append(tuple(rng.choice(points)))
+            else:
+                centroids.append(tuple(rng.choices(points, weights=weights)[0]))
+    else:
+        raise ValueError(f"unknown init {init!r}")
+
+    labels = None
+    kmeans.iterations = 0
+    for it in range(1, max_iter + 1):
+        kmeans.iterations = it
+        new_labels = assign(points, centroids)
+        centroids = update(points, new_labels, k, previous=centroids)
+        if new_labels == labels:                     # nobody moved: converged
+            break
+        labels = new_labels
+    labels = new_labels
+    return labels, centroids, sse_of(points, labels, centroids)
 
 
 def sse_of(points, labels, centroids):
     """Sum of squared distances from each point to its assigned centroid."""
-    raise NotImplementedError("sse")
+    return sum(euclidean(p, centroids[l]) ** 2 for p, l in zip(points, labels))
 
 
 # ------------------------------------------------------------------- harness
